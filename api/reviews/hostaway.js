@@ -1,18 +1,15 @@
-export default function handler(req, res) {
-  res.status(200).json({
-    reviews: [
-      {
-        id: 7453,
-        guest: "Shane Finkelstein",
-        listing: "2B N1 A - 29 Shoreditch Heights",
-        review: "Shane and family are wonderful! Would definitely host again :)"
-      },
-      {
-        id: 7454,
-        guest: "Maria Lopez",
-        listing: "3B Soho Apartments",
-        review: "Great stay, very clean and good communication."
-      }
-    ]
-  });
+import mockData from "../../_data/mock_reviews.json" with { type: "json" };
+import { normalizeReviews } from "../../_lib/normalize.js";
+
+export default async function handler(req, res) {
+  if (req.method !== "GET") {
+    return res.status(405).json({ message: "Method not allowed" });
+  }
+
+  try {
+    const normalized = normalizeReviews(mockData.result || []);
+    return res.status(200).json({ reviews: normalized });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
 }

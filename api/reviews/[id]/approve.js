@@ -1,20 +1,13 @@
-import { readApproved, writeApproved } from "../../../_lib/githubStore.js";
+import { writeApproved } from "../../../_lib/githubStore.js";
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ message: "Method not allowed" });
-  }
+  if (req.method !== "POST") return res.status(405).json({ message: "Method not allowed" });
 
+  const { id } = req.query;
   try {
-    const { id } = req.query;
-    const approved = await readApproved();
-    const updated = Array.from(new Set([...approved, String(id)]));
-
-    await writeApproved(updated);
-
-    return res.status(200).json({ message: `Review ${id} approved`, approved: updated });
+    await writeApproved(id, true);
+    return res.status(200).json({ message: `Review ${id} approved` });
   } catch (err) {
-    console.error(err);
     return res.status(500).json({ error: err.message });
   }
 }
