@@ -1,7 +1,6 @@
-import fs from "fs";
-import path from "path";
 import { normalizeReviews } from "../../../_lib/normalize.js";
 import { readApproved } from "../../../_lib/memoryStore.js";
+import mockData from "../../../_data/mock_reviews.json" with { type: "json" };
 import { setCorsHeaders } from "../../../_lib/cors.js";
 
 export default async function handler(req, res) {
@@ -14,12 +13,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    const filePath = path.join(process.cwd(), "_data/mock_reviews.json");
-    const file = fs.readFileSync(filePath, "utf8");
-    const mockData = JSON.parse(file);
-
-    const normalized = normalizeReviews(mockData.result || []);
     const approvedSet = new Set(readApproved().map(String));
+    const normalized = normalizeReviews(mockData.result || []);
     const filtered = normalized.filter((r) =>
       approvedSet.has(String(r.reviewId))
     );
