@@ -21,11 +21,9 @@ export default async function handler(req, res) {
 
     console.log("Approving review:", id);
 
-    // اقرأ approved الحالي
     const approved = await readApproved();
     console.log("Before approve, approved:", approved);
 
-    // ضيف الـ review الجديد
     const updated = Array.from(new Set([...(approved || []), String(id)]));
     await writeApproved(updated);
 
