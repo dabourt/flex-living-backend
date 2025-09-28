@@ -14,8 +14,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    // اقرأ ملف الـ JSON مباشرة
-    const filePath = path.join(process.cwd(), "api/_data/mock_reviews.json");
+    const filePath = path.join(process.cwd(), "_data/mock_reviews.json");
     const file = fs.readFileSync(filePath, "utf8");
     const mockData = JSON.parse(file);
 
