@@ -1,5 +1,6 @@
+import fs from "fs";
+import path from "path";
 import { setCorsHeaders } from "../../../_lib/cors.js";
-import { addApprovedId } from "../approved/full.js";
 
 export default async function handler(req, res) {
   setCorsHeaders(res);
@@ -9,9 +10,19 @@ export default async function handler(req, res) {
 
   try {
     const { id } = req.query;
-    addApprovedId(id);
-    return res.status(200).json({ message: `Review ${id} approved` });
+    const approvedPath = path.join(process.cwd(), "_data/approved_reviews.json");
+
+    const raw = fs.existsSync(approvedPath) ? fs.readFileSync(approvedPath, "utf8") : "[]";
+    const approved = JSON.parse(raw);
+
+    if (!approved.includes(id)) {
+      approved.push(id);
+      fs.writeFileSync(approvedPath, JSON.stringify(approved, null, 2));
+    }
+
+    return res.status(200).json({ message: `Review ${id} approved`, approved });
   } catch (err) {
+    console.error("Approve error:", err);
     return res.status(500).json({ error: err.message });
   }
 }
