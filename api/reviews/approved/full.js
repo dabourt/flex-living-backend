@@ -1,21 +1,22 @@
 import { setCorsHeaders } from "../../../_lib/cors.js";
-import { normalizeReviews } from "../../_lib/normalize.js";
-import mockData from "../../_data/mock_reviews.json" with { type: "json" };
+import mockData from "../../../_data/mock_reviews.json" with { type: "json" };
+import { normalizeReviews } from "../../../_lib/normalize.js";
 
-import handlerApprove from "../[id]/approve.js";
+let approvedIds = [];
+
+export function addApprovedId(id) {
+  if (!approvedIds.includes(id)) approvedIds.push(id);
+}
 
 export default async function handler(req, res) {
   setCorsHeaders(res);
 
   if (req.method === "OPTIONS") return res.status(200).end();
-  if (req.method !== "GET") {
-    return res.status(405).json({ message: "Method not allowed" });
-  }
+  if (req.method !== "GET") return res.status(405).json({ message: "Method not allowed" });
 
   try {
     const normalized = normalizeReviews(mockData.result || []);
-    const approvedSet = new Set(handlerApprove.approvedIds || []);
-    const filtered = normalized.filter((r) => approvedSet.has(String(r.reviewId)));
+    const filtered = normalized.filter((r) => approvedIds.includes(String(r.reviewId)));
 
     return res.status(200).json({ reviews: filtered });
   } catch (err) {
